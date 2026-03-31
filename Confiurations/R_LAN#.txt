@@ -1,0 +1,111 @@
+R_LAN#
+R_LAN#sh run
+Building configuration...
+
+Current configuration : 1248 bytes
+!
+version 15.4
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname R_LAN
+!
+!
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 256
+ authentication pre-share
+ group 5
+!
+crypto isakmp key Georges123 address 172.70.20.17
+!
+!
+!
+crypto ipsec transform-set VPN-SET1 esp-aes esp-sha-hmac
+!
+crypto map VPN-MAP 10 ipsec-isakmp 
+ set peer 172.70.20.17
+ set pfs group5
+ set transform-set VPN-SET1 
+ match address 110
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0/0
+ ip address 10.70.20.10 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/1
+ ip address 10.70.40.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface Serial0/1/0
+ ip address 172.70.10.2 255.255.255.248
+ crypto map VPN-MAP
+!
+interface Serial0/1/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 30
+ log-adjacency-changes
+ network 172.70.10.0 0.0.0.7 area 0
+ network 10.70.40.0 0.0.0.255 area 0
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+access-list 110 permit ip 10.70.40.0 0.0.0.255 10.70.20.0 0.0.0.255
+!
+no cdp run
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+
+
+R_LAN#
